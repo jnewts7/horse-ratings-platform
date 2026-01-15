@@ -9,12 +9,14 @@ st.title("🏇 Australian Horse Racing Ratings Platform")
 runs = pd.read_csv("data/raw/runs.csv")
 benchmarks = pd.read_csv("data/benchmarks/track_benchmarks.csv")
 sectionals = pd.read_csv("data/raw/sectionals.csv")
+market = pd.read_csv("data/raw/market_odds.csv")
 
 race_id = st.selectbox("Select Race", runs["race_id"].unique())
 race = runs[runs["race_id"] == race_id]
 
 race = race.merge(benchmarks, on=["track", "distance"], how="left")
 race = race.merge(sectionals, on="horse", how="left")
+race = race.merge(market, on="horse", how="left")
 
 ratings = []
 pace_scores = []
@@ -39,11 +41,12 @@ race["pace"] = pace_scores
 
 race["probability"] = race["rating"] / race["rating"].sum()
 race["fair_odds"] = (1 / race["probability"]).round(2)
+race["value"] = (race["market_odds"] / race["fair_odds"]).round(2)
 race = race.sort_values("rating", ascending=False)
 race["rank"] = range(1, len(race) + 1)
 
 st.subheader("📊 Ratings & Fair Odds")
-st.dataframe(race[["horse", "rating", "fair_odds", "rank"]])
+st.dataframe(race[["horse", "rating", "fair_odds", "market_odds", "value", "rank"]])
 
 st.subheader("⚡ Speed Map")
 fig, ax = plt.subplots()
