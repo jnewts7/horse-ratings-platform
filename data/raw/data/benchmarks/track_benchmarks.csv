@@ -1,0 +1,6 @@
+data/
+ ├─ raw/
+ │   ├─ runs.csv
+ │   └─ sectionals.csv
+ └─ benchmarks/
+     └─ track_benchmarks.csv
